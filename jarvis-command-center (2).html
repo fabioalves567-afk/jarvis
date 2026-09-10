@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>JARVIS · Central de Comando</title>
+<style>
+  :root{
+    --bg:#03060d;
+    --bg-grid: rgba(0,168,255,0.05);
+    --panel:#0a1226;
+    --panel-2:#0d1730;
+    --border: rgba(0, 180, 255, 0.22);
+    --border-strong: rgba(0, 210, 255, 0.45);
+    --cyan:#2fd8ff;
+    --cyan-dim:#0d9cc7;
+    --vwblue:#0040c1;
+    --vwblue-deep:#001e50;
+    --green:#00c853;
+    --yellow:#ffd600;
+    --red:#d50000;
+    --text:#e9f2ff;
+    --text-dim:#7d92b5;
+    --text-faint:#4d5d7d;
+    --mono: 'Consolas','SF Mono','Cascadia Code',monospace;
+    --sans: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    --radius: 10px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;height:100%;}
+  body{
+    background:
+      radial-gradient(circle at 15% -10%, rgba(0,64,193,0.25), transparent 45%),
+      radial-gradient(circle at 90% 10%, rgba(47,216,255,0.10), transparent 40%),
+      var(--bg);
+    color:var(--text);
+    font-family:var(--sans);
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    overflow-x:hidden;
+  }
+  ::-webkit-scrollbar{width:8px;height:8px;}
+  ::-webkit-scrollbar-thumb{background:var(--border-strong);border-radius:4px;}
+
+  /* ---------- TOPBAR ---------- */
+  .topbar{
+    display:flex;align-items:center;gap:16px;
+    padding:10px 18px;
+    background:linear-gradient(180deg, rgba(10,18,38,0.95), rgba(10,18,38,0.75));
+    border-bottom:1px solid var(--border);
+    position:sticky;top:0;z-index:20;
+    backdrop-filter: blur(6px);
+  }
+  .brand{display:flex;align-items:center;gap:10px;min-width:190px;}
+  .brand .mark{
+    width:34px;height:34px;border-radius:50%;
+    border:2px solid var(--cyan);
+    display:flex;align-items:center;justify-content:center;
+    font-weight:700;color:var(--cyan);
+    box-shadow:0 0 14px rgba(47,216,255,0.5);
+    font-size:15px;
+  }
+  .brand .txt{line-height:1.1;}
+  .brand .txt b{font-size:14px;letter-spacing:2px;}
+  .brand .txt span{display:block;font-size:9px;letter-spacing:2px;color:var(--text-dim);}
+  .status-pill{
+    display:flex;align-items:center;gap:6px;
+    font-size:11px;letter-spacing:1px;color:var(--green);
+    border:1px solid rgba(0,200,83,0.4);
+    background:rgba(0,200,83,0.08);
+    padding:5px 10px;border-radius:20px;
+  }
+  .status-pill .dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);}
+  .topbar .clockwrap{flex:1;display:flex;flex-direction:column;align-items:center;font-family:var(--mono);}
+  .topbar .clockwrap .date{font-size:11px;color:var(--text-dim);}
+  .topbar .clockwrap .time{font-size:19px;color:var(--cyan);letter-spacing:1px;text-shadow:0 0 10px rgba(47,216,255,0.5);}
+  .topbar .right{display:flex;align-items:center;gap:10px;}
+  .searchbox{
+    display:flex;align-items:center;gap:6px;
+    background:rgba(255,255,255,0.03);
+    border:1px solid var(--border);border-radius:8px;
+    padding:6px 10px;font-size:12px;color:var(--text-dim);
+    min-width:160px;
+  }
+  .searchbox input{background:transparent;border:none;outline:none;color:var(--text);font-size:12px;width:100%;font-family:var(--sans);}
+  .icon-btn{
+    width:32px;height:32px;border-radius:8px;
+    border:1px solid var(--border);background:rgba(255,255,255,0.02);
+    color:var(--text-dim);display:flex;align-items:center;justify-content:center;
+    cursor:pointer;font-size:14px;position:relative;
+  }
+  .icon-btn:hover{border-color:var(--border-strong);color:var(--cyan);}
+  .badge{
+    position:absolute;top:-5px;right:-5px;background:var(--red);color:#fff;
+    font-size:9px;border-radius:8px;padding:1px 5px;font-family:var(--mono);
+  }
+  .operator{display:flex;align-items:center;gap:8px;padding:5px 10px 5px 5px;border:1px solid var(--border);border-radius:20px;font-size:11px;}
+  .operator .av{width:22px;height:22px;border-radius:50%;background:var(--vwblue);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;}
+
+  /* ---------- LAYOUT ---------- */
+  .layout{display:flex;flex:1;min-height:0;}
+  .sidebar{
+    width:196px;flex-shrink:0;
+    background:rgba(8,14,30,0.7);
+    border-right:1px solid var(--border);
+    display:flex;flex-direction:column;
+    padding:14px 10px;gap:2px;
+  }
+  .navitem{
+    display:flex;align-items:center;gap:10px;
+    padding:9px 10px;border-radius:8px;
+    color:var(--text-dim);font-size:12.5px;cursor:pointer;
+    border:1px solid transparent;
+  }
+  .navitem .ic{width:16px;text-align:center;font-size:13px;}
+  .navitem .cnt{margin-left:auto;background:rgba(255,255,255,0.06);color:var(--text-dim);font-size:10px;border-radius:8px;padding:1px 6px;font-family:var(--mono);}
+  .navitem:hover{background:rgba(47,216,255,0.06);color:var(--text);}
+  .navitem.active{
+    background:linear-gradient(90deg, rgba(0,64,193,0.35), rgba(47,216,255,0.08));
+    color:var(--cyan);border-color:var(--border-strong);
+  }
+  .sidebar .voice{
+    margin-top:auto;
+    border-top:1px solid var(--border);padding-top:12px;
+  }
+  .voice-label{font-size:10px;letter-spacing:1px;color:var(--text-faint);margin-bottom:8px;}
+  .wave{display:flex;align-items:flex-end;gap:2px;height:26px;margin-bottom:6px;}
+  .wave span{width:3px;background:var(--cyan-dim);border-radius:2px;animation:wv 1.1s infinite ease-in-out;opacity:0.6;}
+  .wave span:nth-child(odd){animation-delay:0.15s;}
+  .wave span:nth-child(3n){animation-delay:0.3s;}
+  @keyframes wv{0%,100%{height:20%;}50%{height:100%;}}
+  .listening-txt{font-size:11px;color:var(--text-dim);margin-bottom:8px;}
+  .mic-btn{
+    width:100%;padding:9px;border-radius:8px;border:1px solid var(--border-strong);
+    background:rgba(47,216,255,0.06);color:var(--cyan);font-size:11.5px;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;gap:6px;
+  }
+  .mic-btn.on{background:rgba(0,200,83,0.15);border-color:var(--green);color:var(--green);animation:pulseGlow 1.3s infinite;}
+  @keyframes pulseGlow{0%,100%{box-shadow:0 0 4px rgba(0,200,83,0.3);}50%{box-shadow:0 0 16px rgba(0,200,83,0.6);}}
+
+  /* ---------- MAIN ---------- */
+  .main{flex:1;padding:16px;overflow-y:auto;min-width:0;}
+  .view{display:none;}
+  .view.active{display:block;}
+  .grid{display:grid;gap:14px;}
+  .row1{grid-template-columns: 1.05fr 1.4fr 1.05fr;}
+  .row2{grid-template-columns: 1fr; margin-top:14px;}
+  .row3{grid-template-columns: 1.4fr 1fr; margin-top:14px;}
+  .row4{grid-template-columns: 1fr 1fr 1fr; margin-top:14px;}
+  @media(max-width:980px){
+    .row1,.row3,.row4{grid-template-columns:1fr;}
+  }
+
+  .card{
+    background:linear-gradient(180deg, var(--panel), var(--panel-2));
+    border:1px solid var(--border);border-radius:var(--radius);
+    padding:14px;position:relative;
+  }
+  .card::before{
+    content:"";position:absolute;inset:0;border-radius:var(--radius);
+    box-shadow: inset 0 0 24px rgba(47,216,255,0.03);pointer-events:none;
+  }
+  .card h3{
+    margin:0 0 12px 0;font-size:11px;letter-spacing:1.5px;color:var(--text-dim);
+    display:flex;align-items:center;justify-content:space-between;font-weight:600;
+  }
+  .card h3 .lnk{font-size:10px;color:var(--cyan-dim);cursor:pointer;letter-spacing:0.5px;}
+
+  /* AI CORE OVERVIEW */
+  .core-list{display:flex;flex-direction:column;gap:9px;}
+  .core-item{display:flex;align-items:center;gap:9px;font-size:12px;}
+  .core-item .dotstat{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+  .dotstat.on{background:var(--green);box-shadow:0 0 6px var(--green);}
+  .dotstat.off{background:var(--text-faint);}
+  .dotstat.warn{background:var(--yellow);box-shadow:0 0 6px var(--yellow);}
+  .core-item .lbl{color:var(--text-dim);min-width:64px;}
+  .core-item .val{color:var(--text);font-family:var(--mono);font-size:11.5px;}
+
+  /* ORB */
+  .orb-panel{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;min-height:250px;}
+  .orb-wrap{position:relative;width:170px;height:170px;margin-bottom:6px;}
+  .orb-core{
+    position:absolute;inset:38px;border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, rgba(47,216,255,0.55), rgba(0,64,193,0.25) 60%, transparent 75%);
+    box-shadow:0 0 40px rgba(47,216,255,0.35);
+    animation:breathe 3.2s ease-in-out infinite;
+  }
+  @keyframes breathe{0%,100%{transform:scale(1);opacity:0.9;}50%{transform:scale(1.06);opacity:1;}}
+  .ring{position:absolute;border:1px solid var(--border-strong);border-radius:50%;}
+  .ring1{inset:0;animation:spin 14s linear infinite;}
+  .ring2{inset:18px;border-color:rgba(0,64,193,0.35);animation:spin 10s linear infinite reverse;}
+  .ring1::after,.ring2::after{content:"";position:absolute;width:5px;height:5px;background:var(--cyan);border-radius:50%;top:-2.5px;left:50%;box-shadow:0 0 8px var(--cyan);}
+  @keyframes spin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+  .orb-title{font-family:var(--mono);letter-spacing:5px;font-size:17px;color:var(--text);margin-top:4px;}
+  .orb-sub{font-size:10px;letter-spacing:3px;color:var(--cyan-dim);margin-top:2px;}
+  .orb-ver{font-size:9px;color:var(--text-faint);margin-top:6px;font-family:var(--mono);}
+
+  /* FEED */
+  .feed-list{display:flex;flex-direction:column;gap:10px;max-height:260px;overflow-y:auto;}
+  .feed-item{display:flex;gap:9px;font-size:11.5px;padding-bottom:9px;border-bottom:1px solid rgba(255,255,255,0.05);}
+  .feed-item:last-child{border-bottom:none;}
+  .feed-ic{width:22px;height:22px;border-radius:6px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;}
+  .feed-ic.info{background:rgba(0,64,193,0.25);color:#7fb0ff;}
+  .feed-ic.warn{background:rgba(255,214,0,0.15);color:var(--yellow);}
+  .feed-ic.tip{background:rgba(0,200,83,0.15);color:var(--green);}
+  .feed-item .body b{display:block;color:var(--text);font-weight:600;margin-bottom:2px;}
+  .feed-item .body span{color:var(--text-dim);font-size:10.5px;}
+  .tag{font-size:8.5px;letter-spacing:1px;padding:2px 5px;border-radius:4px;margin-left:6px;font-family:var(--mono);}
+  .tag.live{background:rgba(0,200,83,0.15);color:var(--green);}
+  .tag.warn{background:rgba(213,0,0,0.18);color:#ff6b6b;}
+
+  /* AGENTS */
+  .agents-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+  @media(max-width:700px){.agents-grid{grid-template-columns:repeat(2,1fr);}}
+  .agent-card{
+    background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:8px;
+    padding:11px;font-size:11.5px;
+  }
+  .agent-card .top{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+  .agent-card .ic{width:26px;height:26px;border-radius:7px;background:var(--vwblue-deep);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
+  .agent-card b{font-size:11.5px;}
+  .agent-status{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--text-dim);}
+  .miniwave{display:flex;gap:1.5px;align-items:flex-end;height:10px;margin-left:auto;}
+  .miniwave span{width:2px;background:var(--cyan-dim);animation:wv 1s infinite ease-in-out;}
+
+  /* TIMELINE */
+  .tl-item{display:flex;gap:12px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);font-size:12px;}
+  .tl-item:last-child{border-bottom:none;}
+  .tl-time{width:46px;flex-shrink:0;color:var(--text-dim);font-family:var(--mono);font-size:10.5px;padding-top:2px;}
+  .tl-body{flex:1;}
+  .tl-body b{display:block;font-size:12px;}
+  .tl-status{font-size:10px;color:var(--text-faint);}
+  .tl-status.done{color:var(--green);}
+  .tl-status.now{color:var(--cyan);}
+
+  /* QUICK COMMANDS */
+  .qc-btn{
+    display:flex;align-items:center;gap:9px;width:100%;padding:9px 10px;margin-bottom:8px;
+    background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:8px;
+    color:var(--text);font-size:12px;cursor:pointer;text-align:left;
+  }
+  .qc-btn:hover{border-color:var(--border-strong);background:rgba(47,216,255,0.05);}
+  .qc-btn .ic{color:var(--cyan);}
+
+  /* GAUGES */
+  .gauges{display:flex;justify-content:space-around;}
+  .gauge{text-align:center;}
+  .gauge svg{transform:rotate(-90deg);}
+  .gauge .num{margin-top:-58px;font-family:var(--mono);font-size:15px;color:var(--text);}
+  .gauge .lbl{font-size:10px;color:var(--text-dim);margin-top:4px;}
+
+  /* MEMORY INSIGHTS */
+  .mem-stats{display:flex;justify-content:space-between;margin-top:10px;}
+  .mem-stats div{text-align:center;}
+  .mem-stats b{display:block;font-family:var(--mono);font-size:15px;color:var(--cyan);}
+  .mem-stats span{font-size:9.5px;color:var(--text-dim);}
+
+  /* LLM STATUS */
+  .llm-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  .llm-item{display:flex;align-items:center;gap:8px;font-size:11px;padding:7px 8px;border:1px solid var(--border);border-radius:7px;}
+  .llm-item .dotstat{width:6px;height:6px;}
+  .llm-item .name{flex:1;}
+  .llm-item .st{font-size:9px;color:var(--text-faint);}
+  .llm-item.connected .st{color:var(--green);}
+
+  /* EVOLUCAO VIEW */
+  .evo-wrap{max-width:640px;}
+  .evo-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.06);}
+  .evo-row .name{flex:1;font-size:13px;}
+  .stars{display:flex;gap:4px;cursor:pointer;}
+  .stars span{font-size:16px;color:var(--text-faint);}
+  .stars span.filled{color:var(--yellow);text-shadow:0 0 6px rgba(255,214,0,0.5);}
+  .evo-note{font-size:11px;color:var(--text-dim);margin-top:14px;line-height:1.5;}
+  .save-row{margin-top:16px;display:flex;gap:10px;}
+  .btn-primary{background:var(--vwblue);border:1px solid var(--border-strong);color:#fff;padding:9px 16px;border-radius:8px;cursor:pointer;font-size:12.5px;}
+  .btn-ghost{background:transparent;border:1px solid var(--border);color:var(--text-dim);padding:9px 16px;border-radius:8px;cursor:pointer;font-size:12.5px;}
+
+  .placeholder-view{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:340px;text-align:center;color:var(--text-dim);}
+  .placeholder-view .ic{font-size:34px;margin-bottom:10px;color:var(--cyan-dim);}
+
+  /* FOOTER */
+  .footer{
+    display:flex;align-items:center;gap:14px;padding:10px 18px;
+    background:rgba(8,14,30,0.9);border-top:1px solid var(--border);
+    position:sticky;bottom:0;z-index:20;
+  }
+  .fchip{display:flex;align-items:center;gap:7px;font-size:11px;color:var(--text-dim);border:1px solid var(--border);padding:6px 10px;border-radius:8px;}
+  .fchip b{color:var(--text);font-weight:600;}
+  .talk-center{
+    flex:1;display:flex;align-items:center;justify-content:center;gap:14px;
+  }
+  .dots{display:flex;gap:3px;}
+  .dots span{width:3px;height:3px;border-radius:50%;background:var(--text-faint);}
+  .talk-btn{
+    display:flex;flex-direction:column;align-items:center;gap:2px;
+    background:rgba(47,216,255,0.06);border:1px solid var(--border-strong);
+    padding:9px 26px;border-radius:24px;cursor:pointer;min-width:220px;
+  }
+  .talk-btn b{font-size:12px;letter-spacing:1px;color:var(--cyan);}
+  .talk-btn span{font-size:9.5px;color:var(--text-dim);}
+  .talk-btn.on{background:rgba(0,200,83,0.12);border-color:var(--green);}
+  .talk-btn.on b{color:var(--green);}
+  .briefing-btn{background:var(--vwblue);border:1px solid var(--border-strong);color:#fff;padding:8px 16px;border-radius:8px;cursor:pointer;font-size:11.5px;display:flex;align-items:center;gap:6px;}
+
+  /* TOAST */
+  #toast{
+    position:fixed;bottom:78px;left:50%;transform:translateX(-50%) translateY(20px);
+    background:#0d1730;border:1px solid var(--border-strong);color:var(--text);
+    padding:10px 18px;border-radius:8px;font-size:12.5px;opacity:0;pointer-events:none;
+    transition:all .25s ease;z-index:100;box-shadow:0 6px 22px rgba(0,0,0,0.5);
+  }
+  #toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+  /* MODAL */
+  .modal{position:fixed;inset:0;background:rgba(2,5,12,0.75);display:flex;align-items:center;justify-content:center;z-index:200;padding:16px;}
+  .modal.hidden{display:none;}
+  .modal-box{
+    background:linear-gradient(180deg,var(--panel),var(--panel-2));
+    border:1px solid var(--border-strong);border-radius:12px;padding:20px;max-width:420px;width:100%;
+  }
+  .modal-box h4{margin:0 0 12px;font-size:13px;letter-spacing:1.5px;color:var(--cyan);display:flex;justify-content:space-between;align-items:center;}
+  .modal-box .x{cursor:pointer;color:var(--text-dim);}
+  .modal-box p{font-size:12.5px;color:var(--text-dim);line-height:1.6;margin:6px 0;}
+  .modal-box .line{display:flex;justify-content:space-between;font-size:12px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.06);}
+  .modal-box .line b{color:var(--text);font-family:var(--mono);}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">
+    <div class="mark">J</div>
+    <div class="txt"><b>JARVIS</b><span>COMMAND CENTER</span></div>
+  </div>
+  <div class="status-pill"><span class="dot"></span>SYSTEM STATUS · OPERACIONAL</div>
+  <div class="clockwrap">
+    <div class="date" id="dateOut">—</div>
+    <div class="time" id="timeOut">--:--:--</div>
+  </div>
+  <div class="right">
+    <div class="searchbox">🔍<input id="searchInput" placeholder="Buscar agentes, missões..." /></div>
+    <div class="icon-btn" title="Grade">▦</div>
+    <div class="icon-btn" title="Notificações">🔔<span class="badge">3</span></div>
+    <div class="icon-btn" title="Configurações">⚙</div>
+    <div class="operator"><div class="av">FS</div>Fabio</div>
+  </div>
+</div>
+
+<div class="layout">
+  <nav class="sidebar">
+    <div class="navitem active" data-view="command"><span class="ic">🏠</span>Central de Comando</div>
+    <div class="navitem" data-view="ph:AI Core">⚙<span class="ic"></span>AI Core</div>
+    <div class="navitem" data-view="ph:Agentes"><span class="ic">🤖</span>Agentes</div>
+    <div class="navitem" data-view="ph:Tarefas"><span class="ic">📋</span>Tarefas<span class="cnt">3</span></div>
+    <div class="navitem" data-view="ph:Calendário"><span class="ic">📅</span>Calendário</div>
+    <div class="navitem" data-view="ph:Memória"><span class="ic">💾</span>Memória</div>
+    <div class="navitem" data-view="ph:Conversas"><span class="ic">💬</span>Conversas<span class="cnt">12</span></div>
+    <div class="navitem" data-view="ph:Base de Conhecimento"><span class="ic">📚</span>Base de Conhecimento</div>
+    <div class="navitem" data-view="ph:Ferramentas & Habilidades"><span class="ic">🛠</span>Ferramentas & Habilidades<span class="cnt">18</span></div>
+    <div class="navitem" data-view="ph:Fluxos de Trabalho"><span class="ic">🔀</span>Fluxos de Trabalho</div>
+    <div class="navitem" data-view="evolucao"><span class="ic">📈</span>Evolução</div>
+
+    <div class="voice">
+      <div class="voice-label">STATUS DE VOZ</div>
+      <div class="wave" id="wave"></div>
+      <div class="listening-txt" id="listeningTxt">Em espera</div>
+      <button class="mic-btn" id="micBtn">🎙 Toque para falar</button>
+    </div>
+  </nav>
+
+  <main class="main">
+
+    <section id="view-command" class="view active">
+      <div class="grid row1">
+        <div class="card">
+          <h3>AI CORE OVERVIEW</h3>
+          <div class="core-list">
+            <div class="core-item"><span class="dotstat on"></span><span class="lbl">AI Core</span><span class="val">Ativo</span></div>
+            <div class="core-item"><span class="dotstat on"></span><span class="lbl">Memória</span><span class="val" id="memCountLbl">0 sessões</span></div>
+            <div class="core-item"><span class="dotstat off"></span><span class="lbl">Voz</span><span class="val">Offline (local)</span></div>
+            <div class="core-item"><span class="dotstat on"></span><span class="lbl">Agentes</span><span class="val">6 no Fahrwerk HUB</span></div>
+            <div class="core-item"><span class="dotstat warn"></span><span class="lbl">LLMs</span><span class="val">1 conectado</span></div>
+            <div class="core-item"><span class="dotstat on"></span><span class="lbl">Sistema</span><span class="val">Operacional</span></div>
+          </div>
+        </div>
+
+        <div class="card orb-panel">
+          <div class="orb-wrap">
+            <div class="ring ring1"></div>
+            <div class="ring ring2"></div>
+            <div class="orb-core"></div>
+          </div>
+          <div class="orb-title">JARVIS</div>
+          <div class="orb-sub">MENTOR DE DESENVOLVIMENTO</div>
+          <div class="orb-ver">v4.0 · Fabio Santos · Fahrwerk</div>
+        </div>
+
+        <div class="card">
+          <h3>LIVE INTELLIGENCE FEED <span class="tag live">● AO VIVO</span></h3>
+          <div class="feed-list">
+            <div class="feed-item">
+              <div class="feed-ic warn">⚠</div>
+              <div class="body"><b>MONITOR_PHONE pendente<span class="tag warn">ATENÇÃO</span></b><span>Preencher antes de publicar o Housekeeping Audit Simulator</span></div>
+            </div>
+            <div class="feed-item">
+              <div class="feed-ic info">ℹ</div>
+              <div class="body"><b>VDA Ready P6</b><span>Gráficos de evolução e radar VDA aguardando prioridade sua</span></div>
+            </div>
+            <div class="feed-item">
+              <div class="feed-ic tip">💡</div>
+              <div class="body"><b>Skillit Tracker</b><span>Sugestão: adicionar diagnóstico de causa raiz via IA sobre o histórico</span></div>
+            </div>
+            <div class="feed-item">
+              <div class="feed-ic info">ℹ</div>
+              <div class="body"><b>Smart Flow</b><span>Sincronizado com Fernando e Marcelo · sem conflitos</span></div>
+            </div>
+            <div class="feed-item">
+              <div class="feed-ic tip">💡</div>
+              <div class="body"><b>Missão do dia</b><span id="feedMissionTxt">Ainda não registrada hoje</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid row2">
+        <div class="card">
+          <h3>ACTIVE AGENTS — FAHRWERK HUB <span class="lnk" data-view="ph:Agentes">Ver todos ›</span></h3>
+          <div class="agents-grid" id="agentsGrid">
+            <div class="agent-card"><div class="top"><div class="ic">🧩</div><b>Skillit Tracker</b></div><div class="agent-status"><span class="dotstat on"></span>Ativo<div class="miniwave"><span style="animation-delay:.0s"></span><span style="animation-delay:.2s"></span><span style="animation-delay:.4s"></span></div></div></div>
+            <div class="agent-card"><div class="top"><div class="ic">✅</div><b>VDA Ready P6</b></div><div class="agent-status"><span class="dotstat on"></span>Ativo</div></div>
+            <div class="agent-card"><div class="top"><div class="ic">👷</div><b>Smart Flow</b></div><div class="agent-status"><span class="dotstat warn"></span>Sincronizando</div></div>
+            <div class="agent-card"><div class="top"><div class="ic">🔩</div><b>Quebra de Soquetes</b></div><div class="agent-status"><span class="dotstat on"></span>Ativo</div></div>
+            <div class="agent-card"><div class="top"><div class="ic">🏠</div><b>Housekeeping Alerta</b></div><div class="agent-status"><span class="dotstat off"></span>Standby</div></div>
+            <div class="agent-card"><div class="top"><div class="ic">⏰</div><b>Rotina do Monitor</b></div><div class="agent-status"><span class="dotstat off"></span>Standby</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid row3">
+        <div class="card">
+          <h3>MISSÃO DO DIA <span class="lnk">Ver histórico ›</span></h3>
+          <div id="timelineList">
+            <div class="tl-item"><div class="tl-time">15:00</div><div class="tl-body"><b>🧠 IA aplicada ao setor</b><div class="tl-status done">Concluído</div></div></div>
+            <div class="tl-item"><div class="tl-time">15:05</div><div class="tl-body"><b>🇺🇸 Inglês técnico</b><div class="tl-status done">Concluído</div></div></div>
+            <div class="tl-item"><div class="tl-time">15:10</div><div class="tl-body"><b>🗣 Comunicação — simulação</b><div class="tl-status now">Em andamento</div></div></div>
+            <div class="tl-item"><div class="tl-time">15:15</div><div class="tl-body"><b>📚 Ideia de livro — A Meta</b><div class="tl-status">Pendente</div></div></div>
+            <div class="tl-item"><div class="tl-time">15:20</div><div class="tl-body"><b>🎯 Aplicação prática</b><div class="tl-status">Pendente</div></div></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>QUICK COMMANDS</h3>
+          <button class="qc-btn" id="btnRegistrar"><span class="ic">✓</span>Concluir missão de hoje</button>
+          <button class="qc-btn" data-view="evolucao"><span class="ic">📈</span>Ver evolução</button>
+          <button class="qc-btn" id="btnSimular"><span class="ic">🗣</span>Simular apresentação</button>
+          <button class="qc-btn" id="btnDesafio"><span class="ic">⚡</span>Me desafie</button>
+        </div>
+      </div>
+
+      <div class="grid row4">
+        <div class="card">
+          <h3>PROGRESSO SEMANAL</h3>
+          <div class="gauges">
+            <div class="gauge">
+              <svg width="72" height="72"><circle cx="36" cy="36" r="30" stroke="rgba(255,255,255,0.08)" stroke-width="6" fill="none"/><circle id="gaugeSessions" cx="36" cy="36" r="30" stroke="#2fd8ff" stroke-width="6" fill="none" stroke-dasharray="188.5" stroke-dashoffset="188.5" stroke-linecap="round"/></svg>
+              <div class="num" id="gaugeSessionsNum">0/5</div>
+              <div class="lbl">Missões / semana</div>
+            </div>
+            <div class="gauge">
+              <svg width="72" height="72"><circle cx="36" cy="36" r="30" stroke="rgba(255,255,255,0.08)" stroke-width="6" fill="none"/><circle id="gaugeStars" cx="36" cy="36" r="30" stroke="#ffd600" stroke-width="6" fill="none" stroke-dasharray="188.5" stroke-dashoffset="188.5" stroke-linecap="round"/></svg>
+              <div class="num" id="gaugeStarsNum">0%</div>
+              <div class="lbl">Evolução média</div>
+            </div>
+            <div class="gauge">
+              <svg width="72" height="72"><circle cx="36" cy="36" r="30" stroke="rgba(255,255,255,0.08)" stroke-width="6" fill="none"/><circle id="gaugeStreak" cx="36" cy="36" r="30" stroke="#00c853" stroke-width="6" fill="none" stroke-dasharray="188.5" stroke-dashoffset="188.5" stroke-linecap="round"/></svg>
+              <div class="num" id="gaugeStreakNum">0</div>
+              <div class="lbl">Dias seguidos</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>MEMORY INSIGHTS <span class="lnk" data-view="ph:Memória">Ver mapa ›</span></h3>
+          <div class="mem-stats">
+            <div><b id="memSessions">0</b><span>Sessões</span></div>
+            <div><b>12</b><span>Conversas</span></div>
+            <div><b id="memTools">18</b><span>Habilidades</span></div>
+          </div>
+          <div class="evo-note" style="margin-top:14px;">Última sessão: <span id="lastSession">nenhuma ainda</span></div>
+        </div>
+
+        <div class="card">
+          <h3>LLM STATUS <span class="lnk">Gerenciar ›</span></h3>
+          <div class="llm-grid">
+            <div class="llm-item connected"><span class="dotstat on"></span><span class="name">Claude</span><span class="st">Conectado</span></div>
+            <div class="llm-item"><span class="dotstat off"></span><span class="name">OpenAI</span><span class="st">—</span></div>
+            <div class="llm-item"><span class="dotstat off"></span><span class="name">Gemini</span><span class="st">—</span></div>
+            <div class="llm-item"><span class="dotstat off"></span><span class="name">Groq</span><span class="st">—</span></div>
+            <div class="llm-item"><span class="dotstat off"></span><span class="name">Ollama</span><span class="st">—</span></div>
+            <div class="llm-item"><span class="dotstat off"></span><span class="name">Copilot</span><span class="st">—</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="view-evolucao" class="view">
+      <div class="card evo-wrap">
+        <h3>📈 EVOLUÇÃO JARVIS <span class="lnk" data-view="command">‹ Voltar</span></h3>
+        <div id="evoList"></div>
+        <div class="evo-note">Toque nas estrelas pra ajustar cada competência. É uma autoavaliação — sem invenção de progresso, só o que você realmente sentiu na prática de hoje.</div>
+        <div class="save-row">
+          <button class="btn-primary" id="btnSalvarEvo">Salvar avaliação</button>
+          <button class="btn-ghost" data-view="command">Voltar à central</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="view-placeholder" class="view">
+      <div class="card placeholder-view">
+        <div class="ic">🛠</div>
+        <div id="phTitle" style="font-size:14px;color:var(--text);margin-bottom:6px;">Painel</div>
+        <div>Esse painel ainda não foi construído — foco de hoje foi a Central de Comando.</div>
+        <button class="qc-btn" style="max-width:220px;margin-top:16px;" data-view="command">← Voltar à Central</button>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<footer class="footer">
+  <div class="fchip">📍 Setor: <b>Fahrwerk</b></div>
+  <div class="fchip">🕑 Turno: <b>2º Turno</b></div>
+  <div class="talk-center">
+    <div class="dots"><span></span><span></span><span></span><span></span><span></span></div>
+    <button class="talk-btn" id="talkBtn"><b id="talkBtnLbl">🎙 FALE COM O JARVIS</b><span id="talkBtnSub">Toque para começar</span></button>
+    <div class="dots"><span></span><span></span><span></span><span></span><span></span></div>
+  </div>
+  <button class="briefing-btn" id="btnBriefing">▶ Briefing Executivo</button>
+</footer>
+
+<div id="toast"></div>
+
+<div class="modal hidden" id="briefingModal">
+  <div class="modal-box">
+    <h4>EXECUTIVE BRIEFING <span class="x" id="closeBriefing">✕</span></h4>
+    <p>Resumo gerado a partir do que está registrado localmente neste dispositivo.</p>
+    <div class="line"><span>Missões concluídas (7 dias)</span><b id="brSessions">0</b></div>
+    <div class="line"><span>Evolução média</span><b id="brStars">0%</b></div>
+    <div class="line"><span>Dias seguidos ativo</span><b id="brStreak">0</b></div>
+    <div class="line"><span>Competência com maior oportunidade</span><b id="brGap">—</b></div>
+    <p style="margin-top:12px;">Sugestão do JARVIS: <span id="brSuggestion">registre sua primeira missão pra eu começar a te acompanhar de verdade.</span></p>
+  </div>
+</div>
+
+<script>
+(function(){
+  'use strict';
+  var STORE_KEY = 'jarvis_hub_v1';
+
+  var COMPETENCIAS = [
+    'Inteligência Artificial','Comunicação','Inglês','Liderança','Pensamento crítico',
+    'Criatividade','Resolução de problemas','Conhecimento profissional','Tecnologia',
+    'Apresentação em público','Organização','Tomada de decisão','Aprender sozinho','Visão de futuro'
+  ];
+
+  function loadState(){
+    try{
+      var raw = localStorage.getItem(STORE_KEY);
+      if(raw) return JSON.parse(raw);
+    }catch(e){}
+    var stars = {};
+    COMPETENCIAS.forEach(function(c){ stars[c] = 0; });
+    return { stars: stars, sessions: [], version: 1 };
+  }
+  function saveState(){
+    try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }catch(e){}
+  }
+  var state = loadState();
+  COMPETENCIAS.forEach(function(c){ if(!(c in state.stars)) state.stars[c] = 0; });
+
+  // ---------- CLOCK ----------
+  var dias = ['domingo','segunda-feira','terça-feira','quarta-feira','quinta-feira','sexta-feira','sábado'];
+  var meses = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+  function tick(){
+    var d = new Date();
+    document.getElementById('dateOut').textContent = dias[d.getDay()] + ', ' + d.getDate() + ' de ' + meses[d.getMonth()] + ' de ' + d.getFullYear();
+    document.getElementById('timeOut').textContent = d.toLocaleTimeString('pt-BR');
+  }
+  tick(); setInterval(tick, 1000);
+
+  // ---------- WAVE BARS ----------
+  var wave = document.getElementById('wave');
+  for(var i=0;i<18;i++){ var s=document.createElement('span'); s.style.animationDelay=(i*0.07)+'s'; wave.appendChild(s); }
+
+  // ---------- NAV ----------
+  function showView(id){
+    document.querySelectorAll('.view').forEach(function(v){ v.classList.remove('active'); });
+    document.querySelectorAll('.navitem').forEach(function(n){ n.classList.remove('active'); });
+    if(id.indexOf('ph:') === 0){
+      document.getElementById('phTitle').textContent = id.slice(3);
+      document.getElementById('view-placeholder').classList.add('active');
+    } else {
+      document.getElementById('view-' + id).classList.add('active');
+    }
+    var navMatch = document.querySelector('.navitem[data-view="'+id+'"]');
+    if(navMatch) navMatch.classList.add('active');
+    if(id === 'evolucao') renderEvo();
+  }
+  document.querySelectorAll('[data-view]').forEach(function(el){
+    el.addEventListener('click', function(){ showView(el.getAttribute('data-view')); });
+  });
+
+  // ---------- TOAST ----------
+  var toastEl = document.getElementById('toast');
+  var toastTimer;
+  function toast(msg){
+    toastEl.textContent = msg;
+    toastEl.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ toastEl.classList.remove('show'); }, 2600);
+  }
+
+  // ---------- EVOLUCAO VIEW ----------
+  function renderEvo(){
+    var list = document.getElementById('evoList');
+    list.innerHTML = '';
+    COMPETENCIAS.forEach(function(comp){
+      var row = document.createElement('div');
+      row.className = 'evo-row';
+      var val = state.stars[comp] || 0;
+      var starsHtml = '';
+      for(var i=1;i<=5;i++){
+        starsHtml += '<span data-c="'+comp+'" data-v="'+i+'" class="'+(i<=val?'filled':'')+'">★</span>';
+      }
+      row.innerHTML = '<div class="name">'+comp+'</div><div class="stars">'+starsHtml+'</div>';
+      list.appendChild(row);
+    });
+    list.querySelectorAll('.stars span').forEach(function(s){
+      s.addEventListener('click', function(){
+        var c = s.getAttribute('data-c');
+        var v = parseInt(s.getAttribute('data-v'),10);
+        state.stars[c] = (state.stars[c] === v) ? v - 1 : v;
+        renderEvo();
+      });
+    });
+  }
+  document.getElementById('btnSalvarEvo').addEventListener('click', function(){
+    saveState();
+    updateDashboardStats();
+    toast('Avaliação salva.');
+  });
+
+  // ---------- MISSION / SESSIONS ----------
+  function todayStr(){
+    var d = new Date();
+    return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();
+  }
+  document.getElementById('btnRegistrar').addEventListener('click', function(){
+    var t = todayStr();
+    if(state.sessions.indexOf(t) === -1){
+      state.sessions.push(t);
+      saveState();
+      toast('Missão de hoje registrada. Bom trabalho.');
+    } else {
+      toast('A missão de hoje já estava registrada.');
+    }
+    updateDashboardStats();
+  });
+  document.getElementById('btnSimular').addEventListener('click', function(){
+    toast('Cenário: você tem 2 min pra defender uma melhoria pro seu líder. Escreva sua resposta na conversa com o JARVIS.');
+  });
+  document.getElementById('btnDesafio').addEventListener('click', function(){
+    toast('Desafio: sem aumentar custo, como você reduziria o tempo de reteste no VW Flow Track? Pense antes de pedir dica.');
+  });
+
+  function last7DaysCount(){
+    var now = new Date();
+    var count = 0;
+    for(var i=0;i<7;i++){
+      var d = new Date(now); d.setDate(now.getDate()-i);
+      var s = d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();
+      if(state.sessions.indexOf(s) !== -1) count++;
+    }
+    return count;
+  }
+  function currentStreak(){
+    var now = new Date();
+    var streak = 0;
+    for(var i=0;i<365;i++){
+      var d = new Date(now); d.setDate(now.getDate()-i);
+      var s = d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();
+      if(state.sessions.indexOf(s) !== -1){ streak++; } else { break; }
+    }
+    return streak;
+  }
+  function starsAveragePct(){
+    var vals = COMPETENCIAS.map(function(c){ return state.stars[c] || 0; });
+    var sum = vals.reduce(function(a,b){return a+b;},0);
+    return Math.round((sum / (COMPETENCIAS.length * 5)) * 100);
+  }
+  function weakestCompetencia(){
+    var min = 99, chosen = null;
+    COMPETENCIAS.forEach(function(c){
+      var v = state.stars[c] || 0;
+      if(v < min){ min = v; chosen = c; }
+    });
+    return chosen;
+  }
+  function setGauge(circleId, numId, pct, suffixFn){
+    var c = document.getElementById(circleId);
+    var circumference = 188.5;
+    var offset = circumference - (pct/100)*circumference;
+    c.style.strokeDashoffset = offset;
+    document.getElementById(numId).textContent = suffixFn(pct);
+  }
+
+  function updateDashboardStats(){
+    var sessions7 = last7DaysCount();
+    var streak = currentStreak();
+    var avgPct = starsAveragePct();
+
+    setGauge('gaugeSessions','gaugeSessionsNum', Math.min(100,(sessions7/5)*100), function(){ return sessions7+'/5'; });
+    setGauge('gaugeStars','gaugeStarsNum', avgPct, function(p){ return p+'%'; });
+    setGauge('gaugeStreak','gaugeStreakNum', Math.min(100,(streak/7)*100), function(){ return String(streak); });
+
+    document.getElementById('memCountLbl').textContent = state.sessions.length + ' sessões';
+    document.getElementById('memSessions').textContent = state.sessions.length;
+
+    var last = state.sessions.length ? state.sessions[state.sessions.length-1] : null;
+    document.getElementById('lastSession').textContent = last ? last.split('-').reverse().join('/') : 'nenhuma ainda';
+    document.getElementById('feedMissionTxt').textContent = (last === todayStr()) ? 'Registrada hoje ✓' : 'Ainda não registrada hoje';
+  }
+  updateDashboardStats();
+
+  // ---------- BRIEFING MODAL ----------
+  var briefingModal = document.getElementById('briefingModal');
+  document.getElementById('btnBriefing').addEventListener('click', function(){
+    document.getElementById('brSessions').textContent = last7DaysCount();
+    document.getElementById('brStars').textContent = starsAveragePct() + '%';
+    document.getElementById('brStreak').textContent = currentStreak();
+    var gap = weakestCompetencia();
+    document.getElementById('brGap').textContent = gap || '—';
+    document.getElementById('brSuggestion').textContent = state.sessions.length
+      ? ('focar em "'+gap+'" na próxima missão — é onde a nota ainda está mais baixa.')
+      : 'registre sua primeira missão pra eu começar a te acompanhar de verdade.';
+    briefingModal.classList.remove('hidden');
+  });
+  document.getElementById('closeBriefing').addEventListener('click', function(){
+    briefingModal.classList.add('hidden');
+  });
+
+  // ---------- MIC / VOICE — comandos de voz, sem IA, sem custo ----------
+  // Reconhece fala (Web Speech API) e responde com voz sintetizada do navegador
+  // (SpeechSynthesis), sem chamar nenhuma API paga. Funciona por PALAVRAS-CHAVE,
+  // não entende conversa livre.
+  var recognition = null;
+  var listening = false;
+  var SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+  var canSpeak = 'speechSynthesis' in window;
+
+  function speak(text){
+    if(!canSpeak) return;
+    try{
+      window.speechSynthesis.cancel();
+      var u = new SpeechSynthesisUtterance(text);
+      u.lang = 'pt-BR';
+      u.rate = 1.02;
+      window.speechSynthesis.speak(u);
+    }catch(e){}
+  }
+
+  function setListeningUI(on){
+    listening = on;
+    document.getElementById('micBtn').classList.toggle('on', on);
+    document.getElementById('listeningTxt').textContent = on ? 'Ouvindo...' : 'Em espera';
+    document.getElementById('talkBtn').classList.toggle('on', on);
+    document.getElementById('talkBtnLbl').textContent = on ? '🎙 OUVINDO...' : '🎙 FALE COM O JARVIS';
+    document.getElementById('talkBtnSub').textContent = on ? 'Toque para parar' : 'Comandos: evolução, missão, desafio...';
+  }
+
+  var COMANDOS = [
+    { gatilhos:['evolu'], acao:function(){ showView('evolucao'); }, resposta:'Abrindo evolução.' },
+    { gatilhos:['central','comando','início','inicio'], acao:function(){ showView('command'); }, resposta:'Voltando à central de comando.' },
+    { gatilhos:['concluir missão','concluir missao','registrar missão','registrar missao','concluir'], acao:function(){ document.getElementById('btnRegistrar').click(); }, resposta:'Missão registrada. Bom trabalho.' },
+    { gatilhos:['desafio','me desafie'], acao:function(){ document.getElementById('btnDesafio').click(); }, resposta:'Desafio: sem aumentar custo, como você reduziria o tempo de reteste no Flow Track? Pensa antes de pedir dica.' },
+    { gatilhos:['simular','apresentação','apresentacao'], acao:function(){ document.getElementById('btnSimular').click(); }, resposta:'Você tem dois minutos pra defender uma melhoria pro seu líder. Pode começar.' },
+    { gatilhos:['briefing'], acao:function(){ document.getElementById('btnBriefing').click(); }, resposta:null } // fala é montada na hora, com os números reais
+  ];
+
+  function handleComando(said){
+    var lower = said.toLowerCase();
+    for(var i=0;i<COMANDOS.length;i++){
+      var c = COMANDOS[i];
+      for(var j=0;j<c.gatilhos.length;j++){
+        if(lower.indexOf(c.gatilhos[j]) !== -1){
+          c.acao();
+          if(c.resposta) speak(c.resposta);
+          else if(c.gatilhos[0] === 'briefing'){
+            var gap = weakestCompetencia();
+            speak('Briefing: ' + last7DaysCount() + ' missões nos últimos sete dias, evolução média de ' + starsAveragePct() + ' por cento. Foco sugerido: ' + (gap || 'nenhum registrado ainda') + '.');
+          }
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  function toggleListening(){
+    if(!SpeechRec){
+      toast('Reconhecimento de voz não é suportado neste navegador.');
+      return;
+    }
+    if(listening){
+      recognition.stop();
+      setListeningUI(false);
+      return;
+    }
+    recognition = new SpeechRec();
+    recognition.lang = 'pt-BR';
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.onresult = function(e){
+      var said = e.results[0][0].transcript;
+      toast('Você disse: "' + said + '"');
+      var reconhecido = handleComando(said);
+      if(!reconhecido){
+        speak('Não entendi. Os comandos são: evolução, concluir missão, desafio, simular apresentação, briefing, ou central.');
+      }
+    };
+    recognition.onerror = function(ev){
+      setListeningUI(false);
+      if(ev.error === 'not-allowed' || ev.error === 'permission-denied'){
+        toast('Permissão de microfone negada. Se o app estiver salvo como arquivo local, hospede-o em https:// (ex.: seu GitHub Pages) pra permissão ficar salva.');
+      } else {
+        toast('Não consegui entender. Tenta de novo.');
+      }
+    };
+    recognition.onend = function(){ setListeningUI(false); };
+    recognition.start();
+    setListeningUI(true);
+  }
+  document.getElementById('micBtn').addEventListener('click', toggleListening);
+  document.getElementById('talkBtn').addEventListener('click', toggleListening);
+
+  // ---------- SEARCH (filters agent cards) ----------
+  document.getElementById('searchInput').addEventListener('input', function(e){
+    var q = e.target.value.toLowerCase();
+    document.querySelectorAll('#agentsGrid .agent-card').forEach(function(card){
+      var name = card.querySelector('b').textContent.toLowerCase();
+      card.style.display = name.indexOf(q) !== -1 ? '' : 'none';
+    });
+  });
+
+})();
+</script>
+</body>
+</html>
