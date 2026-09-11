@@ -328,7 +328,9 @@
   .talk-btn{touch-action:manipulation;-webkit-tap-highlight-color:transparent;user-select:none;}
   .talk-btn.on{box-shadow:0 0 18px rgba(0,200,83,.35);}
 </style>
-</head>
+<style>
+  .os-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.os-card{min-height:130px;display:flex;flex-direction:column;align-items:flex-start;gap:7px}.os-card .os-ic{font-size:24px}.os-card b{font:700 11px var(--mono)}.os-card small{font-size:10px;color:var(--text-dim);flex:1}.os-card em{font:8px var(--mono);font-style:normal;color:var(--green)}@media(max-width:900px){.os-grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:520px){.os-grid{grid-template-columns:1fr}}
+</style></head>
 <body>
 
 <div class="topbar">
@@ -363,6 +365,7 @@
     <div class="navitem" data-view="ph:Ferramentas & Habilidades"><span class="ic">🛠</span>Ferramentas & Habilidades<span class="cnt">18</span></div>
     <div class="navitem" data-view="ph:Fluxos de Trabalho"><span class="ic">🔀</span>Fluxos de Trabalho</div>
     <div class="navitem" data-view="evolucao"><span class="ic">📈</span>Evolução</div>
+    <div class="navitem" data-view="nord-os"><span class="ic">🧠</span>NORD OS</div>
 
     <div class="voice">
       <div class="voice-label">STATUS DE VOZ</div>
@@ -516,6 +519,20 @@
           <button class="btn-primary" id="btnSalvarEvo">Salvar avaliação</button>
           <button class="btn-ghost" data-view="command">Voltar à central</button>
         </div>
+      </div>
+    </section>
+
+    <section id="view-nord-os" class="view">
+      <div class="development-header"><div><div class="neural-kicker">NORD NEURAL OS · V4</div><h2>Arquitetura do NORD</h2><p>Cérebro, memória, voz, agentes, ferramentas e segurança.</p></div><div class="dev-score"><span>V4</span><small>NEURAL OS</small></div></div>
+      <div class="os-grid">
+        <div class="card os-card core"><span class="os-ic">🧠</span><b>NORD CORE</b><small>Orquestra raciocínio, contexto e prioridades.</small><em>ATIVO</em></div>
+        <div class="card os-card"><span class="os-ic">🧬</span><b>NORD DNA</b><small>Mapa de competências e evolução.</small><em>ATIVO</em></div>
+        <div class="card os-card"><span class="os-ic">🗃️</span><b>NORD MEMORY</b><small>Memória local de missões e avaliações.</small><em>ATIVO</em></div>
+        <div class="card os-card"><span class="os-ic">🎙️</span><b>NORD VOICE</b><small>Reconhecimento e síntese pelo navegador.</small><em>ATIVO</em></div>
+        <div class="card os-card"><span class="os-ic">👁️</span><b>NORD VISION</b><small>Camada preparada para imagens e documentos.</small><em>PRONTO</em></div>
+        <div class="card os-card"><span class="os-ic">🛠️</span><b>NORD TOOLS</b><small>Camada preparada para APIs e ferramentas.</small><em>PRONTO</em></div>
+        <div class="card os-card"><span class="os-ic">🤖</span><b>NORD AGENTS</b><small>Research, Analyst, Coach, Tech e Creative.</small><em>ARQUITETURA</em></div>
+        <div class="card os-card"><span class="os-ic">🛡️</span><b>SECURITY CORE</b><small>Confirmação antes de ações sensíveis.</small><em>ARQUITETURA</em></div>
       </div>
     </section>
 
