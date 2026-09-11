@@ -365,6 +365,13 @@
 @keyframes waveMove{to{transform:translateX(10px)}} 
 @media(max-width:1100px){.neural-layout{grid-template-columns:1fr}.neural-side{display:grid;grid-template-columns:1fr 1fr}.neural-stage{min-height:600px}.neural-tiles{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:700px){.neural-topline{display:none}.neural-stage{min-height:620px}.neural-labels{display:none}.neural-brain{width:82%;top:39%}.neural-brand{top:68%}.neural-name{font-size:30px;letter-spacing:8px}.neural-voice{width:100%;bottom:14px}.voice-bars{display:none}.neural-talk{min-width:240px}.neural-side{grid-template-columns:1fr}.neural-tiles{grid-template-columns:repeat(2,1fr)}}
+</style><style>
+.neural-brain-v2{position:absolute;width:min(72%,620px);aspect-ratio:1.2/1;left:50%;top:43%;transform:translate(-50%,-50%);z-index:3;filter:drop-shadow(0 0 24px rgba(0,190,255,.24))}
+.brain-aura{position:absolute;inset:6%;border-radius:50%;background:radial-gradient(ellipse,rgba(0,174,255,.2),rgba(0,60,160,.1) 48%,transparent 72%);filter:blur(14px);animation:brainAura 3.2s ease-in-out infinite}
+.brain-svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}.brain-outline{stroke-dasharray:4 3;animation:brainScan 8s linear infinite}.brain-folds{filter:drop-shadow(0 0 5px rgba(40,220,255,.35));opacity:.68}.brain-connections{stroke-dasharray:8 8;animation:neuralFlow 3s linear infinite}.brain-nodes circle{fill:#d4faff;stroke:#21d5ff;stroke-width:2;filter:drop-shadow(0 0 7px #21d5ff);animation:nodeBlink 1.8s ease-in-out infinite alternate}.brain-nodes circle:nth-child(2n){animation-delay:.35s}.brain-nodes circle:nth-child(3n){animation-delay:.7s}.brain-center{fill:none;stroke:#0aaee8;stroke-width:5;opacity:.5;filter:drop-shadow(0 0 7px #1fd5ff)}
+.neural-core-badge{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);width:82px;height:82px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(circle at 35% 30%,#35d5ff,#0750b5 62%,#001d5b);border:2px solid #48e2ff;box-shadow:0 0 35px rgba(0,200,255,.65),inset 0 0 18px rgba(255,255,255,.16)}.neural-core-badge strong{font:700 35px var(--mono);line-height:1;color:#fff;text-shadow:0 0 12px #fff}.neural-core-badge span{font:7px var(--mono);letter-spacing:2px;color:#b8f5ff;margin-top:3px}.brain-platform{position:absolute;left:50%;bottom:1%;transform:translateX(-50%);width:42%;height:12%;border:2px solid #21d5ff;border-radius:50%;background:radial-gradient(ellipse,rgba(0,150,255,.18),transparent 65%);box-shadow:0 0 22px rgba(0,200,255,.38),inset 0 0 15px rgba(0,150,255,.25)}
+@keyframes brainAura{50%{transform:scale(1.06);opacity:.8}}@keyframes brainScan{to{stroke-dashoffset:-70}}@keyframes neuralFlow{to{stroke-dashoffset:-50}}@keyframes nodeBlink{to{r:8;opacity:.55}}
+@media(max-width:700px){.neural-brain-v2{width:92%;top:40%}.neural-core-badge{width:64px;height:64px}.neural-core-badge strong{font-size:28px}}
 </style></head>
 <body>
 
@@ -430,20 +437,40 @@
               <div class="neural-label"><i>⚙</i><b>TECNOLOGIA</b><small>Ferramenta para evoluir</small></div>
             </div>
 
-            <div class="neural-brain" aria-label="Núcleo neural do NORD">
-              <div class="brain-glow"></div>
-              <div class="brain-hemisphere left-brain"></div>
-              <div class="brain-hemisphere right-brain"></div>
-              <div class="brain-split"></div>
-              <div class="brain-nodes">
-                <span style="--x:22%;--y:35%"></span><span style="--x:35%;--y:20%"></span><span style="--x:50%;--y:29%"></span>
-                <span style="--x:67%;--y:18%"></span><span style="--x:78%;--y:38%"></span><span style="--x:28%;--y:56%"></span>
-                <span style="--x:44%;--y:48%"></span><span style="--x:58%;--y:55%"></span><span style="--x:73%;--y:59%"></span>
-                <span style="--x:38%;--y:72%"></span><span style="--x:61%;--y:75%"></span>
-              </div>
-              <div class="brain-lines"></div>
-              <div class="brain-core"><strong>N</strong></div>
-              <div class="brain-base"></div>
+            <div class="neural-brain-v2" aria-label="Cérebro neural do NORD">
+  <div class="brain-aura"></div>
+  <svg class="brain-svg" viewBox="0 0 600 500" aria-hidden="true">
+    <defs>
+      <radialGradient id="nbGlow"><stop offset="0%" stop-color="#159eea" stop-opacity=".48"/><stop offset="55%" stop-color="#0752b8" stop-opacity=".24"/><stop offset="100%" stop-color="#001e50" stop-opacity="0"/></radialGradient>
+      <linearGradient id="nbStroke"><stop stop-color="#61e6ff"/><stop offset=".5" stop-color="#16bdf4"/><stop offset="1" stop-color="#0060c8"/></linearGradient>
+      <filter id="nbBlur"><feGaussianBlur stdDeviation="10"/></filter>
+    </defs>
+    <ellipse cx="300" cy="245" rx="230" ry="190" fill="url(#nbGlow)" filter="url(#nbBlur)"/>
+    <path class="brain-outline" d="M296 88C273 63 230 56 194 68C160 79 139 104 137 135C109 139 90 160 90 188C90 209 101 226 115 236C91 254 86 282 98 305C109 327 127 337 150 338C149 368 168 392 195 398C214 403 232 399 247 390C258 410 278 421 300 421C322 421 342 410 353 390C368 399 386 403 405 398C432 392 451 368 450 338C473 337 491 327 502 305C514 282 509 254 485 236C499 226 510 209 510 188C510 160 491 139 463 135C461 104 440 79 406 68C370 56 327 63 304 88C301 91 299 91 296 88Z" fill="rgba(5,66,155,.34)" stroke="url(#nbStroke)" stroke-width="5"/>
+    <g class="brain-folds" fill="none" stroke="#5bdfff" stroke-width="4" stroke-linecap="round">
+      <path d="M167 132C188 111 218 114 228 139C238 164 216 177 190 169C164 161 151 178 161 200C171 222 203 216 214 195"/>
+      <path d="M139 214C157 193 181 197 188 220C195 243 177 254 153 248C130 242 119 258 128 279C138 301 165 300 179 281"/>
+      <path d="M177 318C197 296 225 300 232 325C239 350 219 365 196 357C175 350 164 366 176 384"/>
+      <path d="M433 132C412 111 382 114 372 139C362 164 384 177 410 169C436 161 449 178 439 200C429 222 397 216 386 195"/>
+      <path d="M461 214C443 193 419 197 412 220C405 243 423 254 447 248C470 242 481 258 472 279C462 301 435 300 421 281"/>
+      <path d="M423 318C403 296 375 300 368 325C361 350 381 365 404 357C425 350 436 366 424 384"/>
+      <path d="M244 105C262 125 266 145 253 163C241 180 249 197 266 202M356 105C338 125 334 145 347 163C359 180 351 197 334 202"/>
+      <path d="M240 240C259 220 276 221 286 241C295 259 288 279 270 288M360 240C341 220 324 221 314 241C305 259 312 279 330 288"/>
+      <path d="M242 330C263 311 280 317 287 337C293 354 286 371 269 379M358 330C337 311 320 317 313 337C307 354 314 371 331 379"/>
+    </g>
+    <g class="brain-connections" fill="none" stroke="#1fd5ff" stroke-width="1.5">
+      <path d="M164 153L220 137L267 178L300 126L333 178L380 137L436 153M126 266L185 232L246 260L300 215L354 260L415 232L474 266M178 344L235 329L300 365L365 329L422 344"/>
+    </g>
+    <g class="brain-nodes">
+      <circle cx="164" cy="153" r="6"/><circle cx="220" cy="137" r="5"/><circle cx="267" cy="178" r="6"/><circle cx="300" cy="126" r="6"/><circle cx="333" cy="178" r="6"/><circle cx="380" cy="137" r="5"/><circle cx="436" cy="153" r="6"/>
+      <circle cx="126" cy="266" r="5"/><circle cx="185" cy="232" r="6"/><circle cx="246" cy="260" r="5"/><circle cx="354" cy="260" r="5"/><circle cx="415" cy="232" r="6"/><circle cx="474" cy="266" r="5"/>
+      <circle cx="178" cy="344" r="5"/><circle cx="235" cy="329" r="5"/><circle cx="365" cy="329" r="5"/><circle cx="422" cy="344" r="5"/>
+    </g>
+    <path class="brain-center" d="M300 94C287 130 288 165 300 202C312 165 313 130 300 94M300 205C286 244 287 285 300 318C314 285 314 244 300 205M300 321C289 350 290 378 300 404C310 378 311 350 300 321"/>
+  </svg>
+  <div class="neural-core-badge"><strong>N</strong><span>CORE</span></div>
+  <div class="brain-platform"></div>
+</div>
             </div>
 
             <div class="neural-labels right">
