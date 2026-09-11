@@ -330,13 +330,48 @@
 </style>
 <style>
   .os-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.os-card{min-height:130px;display:flex;flex-direction:column;align-items:flex-start;gap:7px}.os-card .os-ic{font-size:24px}.os-card b{font:700 11px var(--mono)}.os-card small{font-size:10px;color:var(--text-dim);flex:1}.os-card em{font:8px var(--mono);font-style:normal;color:var(--green)}@media(max-width:900px){.os-grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:520px){.os-grid{grid-template-columns:1fr}}
+</style>
+<style>
+/* NORD V4 NEURAL BRAIN LAYOUT */
+.neural-shell{max-width:1500px;margin:0 auto}
+.neural-topline{height:38px;display:flex;align-items:center;justify-content:space-between;padding:0 8px;font:9px var(--mono);letter-spacing:1.5px;color:var(--cyan)}
+.neural-topline small{color:var(--green);font-size:8px;margin-left:6px}.neural-motto{letter-spacing:4px;color:#a8c8ee}.neural-date{color:var(--text-faint);font-size:8px}
+.neural-live{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green);margin-right:5px}
+.neural-layout{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:12px}
+.neural-stage{min-height:620px;position:relative;overflow:hidden;padding:0;background:radial-gradient(circle at 50% 48%,rgba(0,110,255,.13),transparent 35%),linear-gradient(145deg,#071127,#020712)}
+.neural-stage:after{content:"";position:absolute;inset:0;background:linear-gradient(rgba(47,216,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(47,216,255,.025) 1px,transparent 1px);background-size:38px 38px;mask-image:linear-gradient(to bottom,black,transparent 90%);pointer-events:none}
+.neural-labels{position:absolute;top:55px;bottom:190px;width:25%;z-index:4;display:flex;flex-direction:column;justify-content:space-between}
+.neural-labels.left{left:30px}.neural-labels.right{right:30px;align-items:flex-end}
+.neural-label{width:175px;padding:8px 10px;border:1px solid rgba(47,216,255,.28);background:rgba(3,10,25,.65);clip-path:polygon(0 0,92% 0,100% 50%,92% 100%,0 100%);display:grid;grid-template-columns:26px 1fr;column-gap:6px;align-items:center}
+.neural-labels.right .neural-label{clip-path:polygon(8% 0,100% 0,100% 100%,8% 100%,0 50%);grid-template-columns:1fr 26px}.neural-labels.right .neural-label i{grid-column:2;grid-row:1/3}.neural-label i{font-style:normal;font-size:18px;color:var(--cyan);grid-row:1/3;text-align:center}.neural-label b{font:10px var(--mono);letter-spacing:1px}.neural-label small{font-size:8px;color:var(--text-dim);line-height:1.2}
+.neural-brain{position:absolute;width:min(55%,520px);aspect-ratio:1/1;left:50%;top:42%;transform:translate(-50%,-50%);z-index:2;filter:drop-shadow(0 0 20px rgba(0,180,255,.28))}
+.brain-glow{position:absolute;inset:15%;border-radius:50%;background:radial-gradient(circle,rgba(30,175,255,.28),rgba(0,60,170,.08) 48%,transparent 72%);filter:blur(15px);animation:brainPulse 3s ease-in-out infinite}
+.brain-hemisphere{position:absolute;top:20%;width:38%;height:55%;border:3px solid rgba(60,205,255,.9);background:radial-gradient(circle at 45% 45%,rgba(0,145,255,.38),rgba(0,40,120,.18) 62%,transparent 72%);box-shadow:0 0 28px rgba(0,180,255,.35),inset 0 0 25px rgba(0,190,255,.25);filter:blur(.2px)}
+.left-brain{left:13%;border-radius:54% 46% 46% 52%/50% 45% 55% 50%;transform:rotate(-7deg)}.right-brain{right:13%;border-radius:46% 54% 52% 45%/45% 52% 48% 55%;transform:rotate(7deg)}
+.brain-split{position:absolute;left:49.5%;top:21%;height:53%;width:2px;background:linear-gradient(transparent,var(--cyan),transparent);box-shadow:0 0 10px var(--cyan)}
+.brain-lines{position:absolute;inset:23%;background:repeating-linear-gradient(105deg,transparent 0 12px,rgba(100,225,255,.5) 13px 15px,transparent 16px 28px);mix-blend-mode:screen;opacity:.65;transform:rotate(-12deg);border-radius:45%}
+.brain-nodes span{position:absolute;left:var(--x);top:var(--y);width:7px;height:7px;background:#b8f5ff;border-radius:50%;box-shadow:0 0 8px 3px var(--cyan);animation:nodePulse 1.7s infinite alternate}
+.brain-nodes span:nth-child(2n){animation-delay:.3s}.brain-nodes span:nth-child(3n){animation-delay:.7s}
+.brain-core{position:absolute;left:50%;top:48%;transform:translate(-50%,-50%);width:74px;height:74px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle,#20bfff,#003b91 68%,transparent 70%);box-shadow:0 0 40px rgba(0,195,255,.65)}
+.brain-core strong{font:700 34px var(--mono);color:#fff;text-shadow:0 0 15px #fff}
+.brain-base{position:absolute;left:50%;top:76%;transform:translateX(-50%);width:230px;height:50px;border-radius:50%;border:2px solid var(--cyan);box-shadow:0 0 20px rgba(0,200,255,.5),inset 0 0 20px rgba(0,100,255,.35);background:rgba(0,80,160,.12)}
+@keyframes brainPulse{50%{transform:scale(1.12);opacity:.8}}@keyframes nodePulse{to{transform:scale(1.6);opacity:.55}}
+.neural-brand{position:absolute;left:50%;top:68%;transform:translateX(-50%);text-align:center;z-index:5}.neural-name{font:700 42px var(--mono);letter-spacing:12px;color:#fff;text-shadow:0 0 16px rgba(100,220,255,.7)}.neural-sub{font:11px var(--mono);letter-spacing:4px;color:var(--cyan)}.neural-tag{font-size:8px;letter-spacing:3px;color:var(--text-dim);margin-top:5px}
+.neural-voice{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:14px;z-index:8}.voice-bars{width:95px;height:32px;display:flex;align-items:center;gap:2px;justify-content:flex-end}.voice-bars.mirror{justify-content:flex-start}.voice-bars:before{content:"";width:100%;height:20px;background:repeating-linear-gradient(90deg,transparent 0 3px,var(--cyan) 3px 5px,transparent 5px 8px);mask-image:linear-gradient(90deg,transparent,#000 25%,#000 75%,transparent);animation:waveMove 1s linear infinite}.neural-talk{min-width:300px;padding:12px 25px;border:1px solid var(--cyan);border-radius:32px;background:linear-gradient(180deg,rgba(0,150,255,.22),rgba(0,50,130,.25));color:var(--text);cursor:pointer;box-shadow:0 0 22px rgba(0,180,255,.25)}.neural-talk span{font-size:20px;margin-right:9px}.neural-talk b{font:12px var(--mono);letter-spacing:1.5px;color:var(--cyan)}.neural-talk small{display:block;font-size:8px;color:var(--text-dim);margin-top:2px}
+.neural-side{display:flex;flex-direction:column;gap:12px}.neural-card{padding:13px}.neural-card h3{margin-bottom:10px}.neural-card h3 span{font-size:8px;color:var(--cyan-dim);font-weight:400}.progress-main{display:flex;align-items:center;gap:12px}.progress-ring{width:82px;height:82px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle,var(--panel) 55%,transparent 57%),conic-gradient(var(--cyan) 0 72%,rgba(255,255,255,.08) 72%);box-shadow:0 0 14px rgba(0,190,255,.2)}.progress-ring strong{font:18px var(--mono)}.progress-list{flex:1}.progress-list div{display:flex;justify-content:space-between;font-size:9px;padding:3px 0;color:var(--text-dim)}.progress-list span{color:var(--cyan);font-family:var(--mono)}
+.mission-box{background:rgba(255,255,255,.025);border:1px solid var(--border);border-radius:8px;padding:11px;font-size:11px;line-height:1.45}.mission-box label{display:block;margin-top:10px;color:var(--text-dim);font-size:10px}.mission-box input{accent-color:var(--cyan);margin-right:6px}
+.tip-card p{font-size:10px;color:var(--text-dim);line-height:1.55;margin:0}.system-card{flex:1}.system-row{font-size:10px;color:var(--text-dim);padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04)}.system-row::first-letter{color:var(--green)}
+.neural-tiles{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-top:12px}.neural-tile{text-align:center;cursor:pointer;padding:14px 8px;color:var(--text)}.neural-tile:hover{border-color:var(--cyan);transform:translateY(-2px)}.neural-tile span{display:block;font-size:21px;color:var(--cyan);margin-bottom:7px}.neural-tile b{display:block;font:10px var(--mono);letter-spacing:1px}.neural-tile small{display:block;font-size:9px;color:var(--text-dim);margin-top:4px;line-height:1.3}
+@keyframes waveMove{to{transform:translateX(10px)}} 
+@media(max-width:1100px){.neural-layout{grid-template-columns:1fr}.neural-side{display:grid;grid-template-columns:1fr 1fr}.neural-stage{min-height:600px}.neural-tiles{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:700px){.neural-topline{display:none}.neural-stage{min-height:620px}.neural-labels{display:none}.neural-brain{width:82%;top:39%}.neural-brand{top:68%}.neural-name{font-size:30px;letter-spacing:8px}.neural-voice{width:100%;bottom:14px}.voice-bars{display:none}.neural-talk{min-width:240px}.neural-side{grid-template-columns:1fr}.neural-tiles{grid-template-columns:repeat(2,1fr)}}
 </style></head>
 <body>
 
 <div class="topbar">
   <div class="brand">
-    <div class="mark">J</div>
-    <div class="txt"><b>NORD</b><span>COMMAND CENTER</span></div>
+    <div class="mark">N</div>
+    <div class="txt"><b>NORD</b><span>NEURAL DEVELOPMENT OS</span></div>
   </div>
   <div class="status-pill"><span class="dot"></span>SYSTEM STATUS · OPERACIONAL</div>
   <div class="clockwrap">
@@ -377,135 +412,89 @@
 
   <main class="main">
 
+
     <section id="view-command" class="view active">
-      <div class="grid row1">
-        <div class="card">
-          <h3>AI CORE OVERVIEW</h3>
-          <div class="core-list">
-            <div class="core-item"><span class="dotstat on"></span><span class="lbl">AI Core</span><span class="val">Ativo</span></div>
-            <div class="core-item"><span class="dotstat on"></span><span class="lbl">Memória</span><span class="val" id="memCountLbl">0 sessões</span></div>
-            <div class="core-item"><span class="dotstat off"></span><span class="lbl">Voz</span><span class="val">Offline (local)</span></div>
-            <div class="core-item"><span class="dotstat on"></span><span class="lbl">Agentes</span><span class="val">6 no Fahrwerk HUB</span></div>
-            <div class="core-item"><span class="dotstat warn"></span><span class="lbl">LLMs</span><span class="val">1 conectado</span></div>
-            <div class="core-item"><span class="dotstat on"></span><span class="lbl">Sistema</span><span class="val">Operacional</span></div>
-          </div>
+      <div class="neural-shell">
+        <div class="neural-topline">
+          <div><span class="neural-live"></span> NORD NEURAL CORE <small>ONLINE</small></div>
+          <div class="neural-motto">PENSAR · APRENDER · APLICAR · EVOLUIR</div>
+          <div class="neural-date" id="neuralDate">NEURAL MODE · V4</div>
         </div>
 
-        <div class="card orb-panel">
-          <div class="orb-wrap">
-            <div class="ring ring1"></div>
-            <div class="ring ring2"></div>
-            <div class="orb-core"></div>
-          </div>
-          <div class="orb-title">NORD</div>
-          <div class="orb-sub">MENTOR DE DESENVOLVIMENTO</div>
-          <div class="orb-ver">v4.0 · Fabio Santos · Fahrwerk</div>
-        </div>
+        <div class="neural-layout">
+          <div class="neural-stage card">
+            <div class="neural-labels left">
+              <div class="neural-label"><i>◉</i><b>PESSOAS</b><small>Juntos mais longe</small></div>
+              <div class="neural-label"><i>▣</i><b>CONHECIMENTO</b><small>Transforma realidades</small></div>
+              <div class="neural-label"><i>▥</i><b>DISCIPLINA</b><small>Constância gera resultados</small></div>
+              <div class="neural-label"><i>⚙</i><b>TECNOLOGIA</b><small>Ferramenta para evoluir</small></div>
+            </div>
 
-        <div class="card">
-          <h3>LIVE INTELLIGENCE FEED <span class="tag live">● AO VIVO</span></h3>
-          <div class="feed-list">
-            <div class="feed-item">
-              <div class="feed-ic warn">⚠</div>
-              <div class="body"><b>MONITOR_PHONE pendente<span class="tag warn">ATENÇÃO</span></b><span>Preencher antes de publicar o Housekeeping Audit Simulator</span></div>
+            <div class="neural-brain" aria-label="Núcleo neural do NORD">
+              <div class="brain-glow"></div>
+              <div class="brain-hemisphere left-brain"></div>
+              <div class="brain-hemisphere right-brain"></div>
+              <div class="brain-split"></div>
+              <div class="brain-nodes">
+                <span style="--x:22%;--y:35%"></span><span style="--x:35%;--y:20%"></span><span style="--x:50%;--y:29%"></span>
+                <span style="--x:67%;--y:18%"></span><span style="--x:78%;--y:38%"></span><span style="--x:28%;--y:56%"></span>
+                <span style="--x:44%;--y:48%"></span><span style="--x:58%;--y:55%"></span><span style="--x:73%;--y:59%"></span>
+                <span style="--x:38%;--y:72%"></span><span style="--x:61%;--y:75%"></span>
+              </div>
+              <div class="brain-lines"></div>
+              <div class="brain-core"><strong>N</strong></div>
+              <div class="brain-base"></div>
             </div>
-            <div class="feed-item">
-              <div class="feed-ic info">ℹ</div>
-              <div class="body"><b>VDA Ready P6</b><span>Gráficos de evolução e radar VDA aguardando prioridade sua</span></div>
-            </div>
-            <div class="feed-item">
-              <div class="feed-ic tip">💡</div>
-              <div class="body"><b>Skillit Tracker</b><span>Sugestão: adicionar diagnóstico de causa raiz via IA sobre o histórico</span></div>
-            </div>
-            <div class="feed-item">
-              <div class="feed-ic info">ℹ</div>
-              <div class="body"><b>Smart Flow</b><span>Sincronizado com Fernando e Marcelo · sem conflitos</span></div>
-            </div>
-            <div class="feed-item">
-              <div class="feed-ic tip">💡</div>
-              <div class="body"><b>Missão do dia</b><span id="feedMissionTxt">Ainda não registrada hoje</span></div>
-            </div>
-          </div>
-        </div>
-      </div>
 
-      <div class="grid row2">
-        <div class="card">
-          <h3>ACTIVE AGENTS — FAHRWERK HUB <span class="lnk" data-view="ph:Agentes">Ver todos ›</span></h3>
-          <div class="agents-grid" id="agentsGrid">
-            <div class="agent-card"><div class="top"><div class="ic">🧩</div><b>Skillit Tracker</b></div><div class="agent-status"><span class="dotstat on"></span>Ativo<div class="miniwave"><span style="animation-delay:.0s"></span><span style="animation-delay:.2s"></span><span style="animation-delay:.4s"></span></div></div></div>
-            <div class="agent-card"><div class="top"><div class="ic">✅</div><b>VDA Ready P6</b></div><div class="agent-status"><span class="dotstat on"></span>Ativo</div></div>
-            <div class="agent-card"><div class="top"><div class="ic">👷</div><b>Smart Flow</b></div><div class="agent-status"><span class="dotstat warn"></span>Sincronizando</div></div>
-            <div class="agent-card"><div class="top"><div class="ic">🔩</div><b>Quebra de Soquetes</b></div><div class="agent-status"><span class="dotstat on"></span>Ativo</div></div>
-            <div class="agent-card"><div class="top"><div class="ic">🏠</div><b>Housekeeping Alerta</b></div><div class="agent-status"><span class="dotstat off"></span>Standby</div></div>
-            <div class="agent-card"><div class="top"><div class="ic">⏰</div><b>Rotina do Monitor</b></div><div class="agent-status"><span class="dotstat off"></span>Standby</div></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="grid row3">
-        <div class="card">
-          <h3>MISSÃO DO DIA <span class="lnk">Ver histórico ›</span></h3>
-          <div id="timelineList">
-            <div class="tl-item"><div class="tl-time">15:00</div><div class="tl-body"><b>🧠 IA aplicada ao setor</b><div class="tl-status done">Concluído</div></div></div>
-            <div class="tl-item"><div class="tl-time">15:05</div><div class="tl-body"><b>🇺🇸 Inglês técnico</b><div class="tl-status done">Concluído</div></div></div>
-            <div class="tl-item"><div class="tl-time">15:10</div><div class="tl-body"><b>🗣 Comunicação — simulação</b><div class="tl-status now">Em andamento</div></div></div>
-            <div class="tl-item"><div class="tl-time">15:15</div><div class="tl-body"><b>📚 Ideia de livro — A Meta</b><div class="tl-status">Pendente</div></div></div>
-            <div class="tl-item"><div class="tl-time">15:20</div><div class="tl-body"><b>🎯 Aplicação prática</b><div class="tl-status">Pendente</div></div></div>
-          </div>
-        </div>
-
-        <div class="card">
-          <h3>QUICK COMMANDS</h3>
-          <button class="qc-btn" id="btnRegistrar"><span class="ic">✓</span>Concluir missão de hoje</button>
-          <button class="qc-btn" data-view="evolucao"><span class="ic">📈</span>Ver evolução</button>
-          <button class="qc-btn" id="btnSimular"><span class="ic">🗣</span>Simular apresentação</button>
-          <button class="qc-btn" id="btnDesafio"><span class="ic">⚡</span>Me desafie</button>
-        </div>
-      </div>
-
-      <div class="grid row4">
-        <div class="card">
-          <h3>PROGRESSO SEMANAL</h3>
-          <div class="gauges">
-            <div class="gauge">
-              <svg width="72" height="72"><circle cx="36" cy="36" r="30" stroke="rgba(255,255,255,0.08)" stroke-width="6" fill="none"/><circle id="gaugeSessions" cx="36" cy="36" r="30" stroke="#2fd8ff" stroke-width="6" fill="none" stroke-dasharray="188.5" stroke-dashoffset="188.5" stroke-linecap="round"/></svg>
-              <div class="num" id="gaugeSessionsNum">0/5</div>
-              <div class="lbl">Missões / semana</div>
+            <div class="neural-labels right">
+              <div class="neural-label"><i>✦</i><b>IDEIAS</b><small>Grandes soluções nascem aqui</small></div>
+              <div class="neural-label"><i>◎</i><b>ESTRATÉGIA</b><small>Direção para o futuro</small></div>
+              <div class="neural-label"><i>▷</i><b>AÇÃO</b><small>Do plano à prática</small></div>
+              <div class="neural-label"><i>↗</i><b>RESULTADOS</b><small>Evolução sempre</small></div>
             </div>
-            <div class="gauge">
-              <svg width="72" height="72"><circle cx="36" cy="36" r="30" stroke="rgba(255,255,255,0.08)" stroke-width="6" fill="none"/><circle id="gaugeStars" cx="36" cy="36" r="30" stroke="#ffd600" stroke-width="6" fill="none" stroke-dasharray="188.5" stroke-dashoffset="188.5" stroke-linecap="round"/></svg>
-              <div class="num" id="gaugeStarsNum">0%</div>
-              <div class="lbl">Evolução média</div>
+
+            <div class="neural-brand">
+              <div class="neural-name">NORD</div>
+              <div class="neural-sub">NEURAL DEVELOPMENT OS</div>
+              <div class="neural-tag">SEU MENTOR DE DESENVOLVIMENTO</div>
             </div>
-            <div class="gauge">
-              <svg width="72" height="72"><circle cx="36" cy="36" r="30" stroke="rgba(255,255,255,0.08)" stroke-width="6" fill="none"/><circle id="gaugeStreak" cx="36" cy="36" r="30" stroke="#00c853" stroke-width="6" fill="none" stroke-dasharray="188.5" stroke-dashoffset="188.5" stroke-linecap="round"/></svg>
-              <div class="num" id="gaugeStreakNum">0</div>
-              <div class="lbl">Dias seguidos</div>
+
+            <div class="neural-voice">
+              <div class="voice-bars" id="voiceBars"></div>
+              <button class="neural-talk" id="neuralTalkProxy"><span>🎙</span><b>FALE COM O NORD</b><small>ou digite a sua pergunta</small></button>
+              <div class="voice-bars mirror" id="voiceBars2"></div>
             </div>
           </div>
+
+          <aside class="neural-side">
+            <div class="card neural-card progress-card">
+              <h3>⌁ MEU PROGRESSO <span>Ver detalhes ›</span></h3>
+              <div class="progress-main"><div class="progress-ring"><strong id="neuralProgress">0%</strong></div>
+                <div class="progress-list"><div><b>Conhecimento</b><span>75%</span></div><div><b>Disciplina</b><span>68%</span></div><div><b>Aplicação</b><span>70%</span></div><div><b>Resultados</b><span>72%</span></div><div><b>Evolução</b><span>78%</span></div></div>
+              </div>
+            </div>
+            <div class="card neural-card">
+              <h3>◎ MISSÃO DE HOJE <span>Ver todas ›</span></h3>
+              <div class="mission-box"><b>Aprender algo novo e aplicar no seu dia.</b><label><input type="checkbox" id="neuralMissionCheck"> Concluir missão</label></div>
+            </div>
+            <div class="card neural-card tip-card">
+              <h3>💡 DICA DO NORD</h3>
+              <p>“A tecnologia é poderosa, mas o maior diferencial sempre será o ser humano que aprende e evolui.”</p>
+            </div>
+            <div class="card neural-card system-card">
+              <h3><span class="neural-live"></span> NORD ONLINE</h3>
+              <div class="system-row">✓ IA ativa</div><div class="system-row">✓ Memória local</div><div class="system-row">✓ Agentes disponíveis</div><div class="system-row">✓ Pronto para ajudar</div>
+            </div>
+          </aside>
         </div>
 
-        <div class="card">
-          <h3>MEMORY INSIGHTS <span class="lnk" data-view="ph:Memória">Ver mapa ›</span></h3>
-          <div class="mem-stats">
-            <div><b id="memSessions">0</b><span>Sessões</span></div>
-            <div><b>12</b><span>Conversas</span></div>
-            <div><b id="memTools">18</b><span>Habilidades</span></div>
-          </div>
-          <div class="evo-note" style="margin-top:14px;">Última sessão: <span id="lastSession">nenhuma ainda</span></div>
-        </div>
-
-        <div class="card">
-          <h3>LLM STATUS <span class="lnk">Gerenciar ›</span></h3>
-          <div class="llm-grid">
-            <div class="llm-item connected"><span class="dotstat on"></span><span class="name">Claude</span><span class="st">Conectado</span></div>
-            <div class="llm-item"><span class="dotstat off"></span><span class="name">OpenAI</span><span class="st">—</span></div>
-            <div class="llm-item"><span class="dotstat off"></span><span class="name">Gemini</span><span class="st">—</span></div>
-            <div class="llm-item"><span class="dotstat off"></span><span class="name">Groq</span><span class="st">—</span></div>
-            <div class="llm-item"><span class="dotstat off"></span><span class="name">Ollama</span><span class="st">—</span></div>
-            <div class="llm-item"><span class="dotstat off"></span><span class="name">Copilot</span><span class="st">—</span></div>
-          </div>
+        <div class="neural-tiles">
+          <button class="card neural-tile" data-view="evolucao"><span>▥</span><b>EVOLUÇÃO</b><small>Desenvolva suas competências</small></button>
+          <button class="card neural-tile" id="neuralMissionBtn"><span>◎</span><b>MISSÕES</b><small>Desafios para seu crescimento</small></button>
+          <button class="card neural-tile" data-view="nord-os"><span>▣</span><b>NORD OS</b><small>Centro de comando de IA</small></button>
+          <button class="card neural-tile" data-view="ph:Base de Conhecimento"><span>▤</span><b>CONHECIMENTO</b><small>Aprenda algo novo todos os dias</small></button>
+          <button class="card neural-tile" data-view="ph:Ferramentas & Habilidades"><span>⚒</span><b>FERRAMENTAS</b><small>Recursos para o seu dia</small></button>
+          <button class="card neural-tile" data-view="ph:Agentes"><span>♙</span><b>NORD COACH</b><small>Orientação personalizada</small></button>
         </div>
       </div>
     </section>
@@ -876,6 +865,20 @@
   document.getElementById('micBtn').addEventListener('click', toggleListening);
   document.getElementById('talkBtn').addEventListener('click', toggleListening);
 
+
+  // ---------- NEURAL HOME CONTROLS ----------
+  var neuralTalkProxy=document.getElementById('neuralTalkProxy');
+  if(neuralTalkProxy) neuralTalkProxy.addEventListener('click',function(){ document.getElementById('talkBtn').click(); });
+  var neuralMissionBtn=document.getElementById('neuralMissionBtn');
+  if(neuralMissionBtn) neuralMissionBtn.addEventListener('click',function(){ document.getElementById('btnRegistrar').click(); });
+  var neuralMissionCheck=document.getElementById('neuralMissionCheck');
+  if(neuralMissionCheck) neuralMissionCheck.addEventListener('change',function(){ if(this.checked) document.getElementById('btnRegistrar').click(); });
+  function updateNeuralProgress(){
+    var el=document.getElementById('neuralProgress');
+    if(el) el.textContent=starsAveragePct()+'%';
+  }
+  updateNeuralProgress();
+  
   // ---------- SEARCH (filters agent cards) ----------
   document.getElementById('searchInput').addEventListener('input', function(e){
     var q = e.target.value.toLowerCase();
