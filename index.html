@@ -445,6 +445,10 @@
     .neural-metrics div{padding:6px 3px;}
     .neural-metrics span{font-size:8.5px;}
   }
+
+  .talk-btn.listening{background:rgba(0,200,83,.16)!important;border-color:var(--green)!important;color:var(--green)!important;box-shadow:0 0 18px rgba(0,200,83,.25);animation:voicePulse 1.2s infinite}
+  .talk-btn.error{border-color:#ff6b6b!important;color:#ff8a8a!important}
+  @keyframes voicePulse{0%,100%{box-shadow:0 0 5px rgba(0,200,83,.25)}50%{box-shadow:0 0 22px rgba(0,200,83,.55)}}
 </style>
 </head>
 <body>
@@ -868,7 +872,9 @@
       document.getElementById('phTitle').textContent = id.slice(3);
       document.getElementById('view-placeholder').classList.add('active');
     } else {
-      document.getElementById('view-' + id).classList.add('active');
+      var target=document.getElementById('view-' + id);
+      if(!target){ toast('Painel ainda não disponível: '+id); return; }
+      target.classList.add('active');
     }
     var navMatch = document.querySelector('.navitem[data-view="'+id+'"]');
     if(navMatch) navMatch.classList.add('active');
